@@ -44,25 +44,65 @@ class Root(Tk):
 
 
     def count_button(self):
-        total_num = int(self.total_num.get())
-        num_to_take = int(self.num_to_take.get())
-        num_to_know = int(self.num_to_know.get())
-        questions = list(x for x in range(0, total_num+1))
-        success = 0
-        all_runs = 100000
-        chances = []
-
-        for i_know in questions:
-            for i in range(all_runs):
-                for question_sample in  sorted(random.sample(questions, num_to_take))[0:num_to_know]:
-                    if question_sample > i_know:
-                        break
-                else:
-                    success += 1
-            chances.append((success / all_runs) * 100)
+        current_state = self.rb_choice.get()
+        if current_state == 1:
+            total_num = int(self.total_num.get())
+            num_to_take = int(self.num_to_take.get())
+            num_to_know = int(self.num_to_know.get())
+            questions = list(x for x in range(0, total_num+1))
             success = 0
-        self.x_axis = questions
-        self.y_axis = chances
+            all_runs = 100000
+            chances = []
+
+            for i_know in questions:
+                for i in range(all_runs):
+                    for question_sample in  sorted(random.sample(questions, num_to_take))[0:num_to_know]:
+                        if question_sample > i_know:
+                            break
+                    else:
+                        success += 1
+                chances.append((success / all_runs) * 100)
+                success = 0
+            self.x_axis = questions
+            self.y_axis = chances
+        elif current_state == 2:
+            total_num_p1 = int(self.total_num_p1.get())
+            num_to_take_p1 = int(self.num_to_take_p1.get())
+            num_to_know_p1 = int(self.num_to_know_p1.get())
+            questions1 = list(x for x in range(0, total_num_p1 + 1))
+            success = 0
+            all_runs = 100000
+            chances1 = []
+
+            for i_know in questions1:
+                for i in range(all_runs):
+                    for question_sample in sorted(random.sample(questions1, num_to_take_p1))[0:num_to_know_p1]:
+                        if question_sample > i_know:
+                            break
+                    else:
+                        success += 1
+                chances1.append(success / all_runs)
+                success = 0
+
+            total_num_p2 = int(self.total_num_p2.get())
+            num_to_take_p2 = int(self.num_to_take_p2.get())
+            num_to_know_p2 = int(self.num_to_know_p2.get())
+            questions2 = list(x for x in range(0, total_num_p2 + 1))
+            success = 0
+            chances2 = []
+
+            for i_know in questions2:
+                for i in range(all_runs):
+                    for question_sample in sorted(random.sample(questions2, num_to_take_p2))[0:num_to_know_p2]:
+                        if question_sample > i_know:
+                            break
+                    else:
+                        success += 1
+                chances2.append(success / all_runs)
+                success = 0
+
+            self.x_axis = compare_p2_lists(questions1, questions2)
+            self.y_axis = count_probabilities(chances1, chances2)
         self.draw_plot()
 
     def init_ui(self):
@@ -210,6 +250,21 @@ class Root(Tk):
         toolbar_frame = Frame(self)
         toolbar_frame.grid(column=0, row=1)
         toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
+
+def compare_p2_lists(list1, list2):
+    if len(list1) >= len(list2):
+        return list1
+    else:
+        return list2
+
+def count_probabilities(list1, list2):
+    if len(list1) > len(list2):
+        for _ in range(len(list1)-len(list2)):
+            list2.append(list2[-1])
+    elif len(list1) < len(list2):
+        for _ in range(len(list2) - len(list1)):
+            list1.append(list1[-1])
+    return [a*b*100 for a,b in zip(list1,list2)]
 
 
 root = Root()
