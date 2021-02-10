@@ -9,7 +9,7 @@ class Root(Tk):
     def __init__(self):
         super(Root, self).__init__()
 
-        self.title('Bestie')
+        self.title("""Nikita's probability counter""")
         self.minsize(720, 480)
         self.label_frame = Frame(self, height=300, width=250)
         self.label_frame.grid(column=1, row=0, padx=30, sticky=W)
@@ -29,8 +29,8 @@ class Root(Tk):
         self.rb_choice = IntVar()
         self.rb1 = ttk.Radiobutton(self.label_frame, text='1', variable=self.rb_choice, value=1, command=self.pick_rb)
         self.rb2 = ttk.Radiobutton(self.label_frame, text='2', variable=self.rb_choice, value=2, command=self.pick_rb)
-        self.rb1.grid(column=0, row=1)
-        self.rb2.grid(column=1, row=1)
+        self.rb1.grid(column=0, row=1, sticky=W)
+        self.rb2.grid(column=1, row=1, sticky=W)
         self.rb_choice.set('1')
 
         self.button = ttk.Button(self.label_frame, text='Посчитать', command=self.count_button)
@@ -44,6 +44,10 @@ class Root(Tk):
 
 
     def count_button(self):
+        try:
+            self.concrete_answer.destroy()
+        except:
+            pass
         current_state = self.rb_choice.get()
         if current_state == 1:
             total_num = int(self.total_num.get())
@@ -105,6 +109,38 @@ class Root(Tk):
             self.y_axis = count_probabilities(chances1, chances2)
         self.draw_plot()
 
+        try:
+            concrete1 = int(self.concrete_p1.get())
+            concrete2 = int(self.concrete_p2.get())
+        except:
+            concrete1 = False
+            concrete2 = False
+
+        if concrete1 and concrete2:
+            for i in range(all_runs):
+                for question_sample in sorted(random.sample(questions1, num_to_take_p1))[0:num_to_know_p1]:
+                    if question_sample > concrete1:
+                        break
+                else:
+                    success += 1
+            answer_concrete_1 = (success / all_runs)
+            success = 0
+
+            for i in range(all_runs):
+                for question_sample in sorted(random.sample(questions2, num_to_take_p2))[0:num_to_know_p2]:
+                    if question_sample > concrete2:
+                        break
+                else:
+                    success += 1
+            answer_concrete_2 = (success / all_runs)
+            success = 0
+            self.concrete_answer = ttk.Label(self.label_frame, text='Вероятность сдать  {}%'.format(
+                int(answer_concrete_1 * answer_concrete_2*100)))
+            self.concrete_answer.grid(column=0, row=14, sticky=W, columnspan=3)
+            self.concrete_answer.configure(background='#ffffff', font=("Arial", 20))
+
+
+
     def init_ui(self):
         current_state = self.rb_choice.get()
         if current_state == 1:
@@ -123,11 +159,17 @@ class Root(Tk):
                 self.label_part_2_2.destroy()
                 self.label_part_1_3.destroy()
                 self.label_part_2_3.destroy()
+                self.label_part_1_4.destroy()
+                self.label_part_2_4.destroy()
+                self.textbox_concrete_p1.destroy()
+                self.textbox_concrete_p2.destroy()
+                self.label_concrete.destroy()
                 self.button.grid(row=8)
+                self.concrete_answer.destroy()
+                self.concrete_p1.destroy()
+                self.concrete_p2.destroy()
             except:
                 pass
-
-
 
 
             self.label_total_num = ttk.Label(self.label_frame, text='Количество билетов')
@@ -167,7 +209,11 @@ class Root(Tk):
             self.textbox_total_num.destroy()
             self.textbox_num_to_take.destroy()
             self.textbox_num_to_know.destroy()
-            self.button.grid(row=11)
+            self.button.grid(row=13)
+            try:
+                self.concrete_answer.destroy()
+            except:
+                pass
 
             self.label_total_num = ttk.Label(self.label_frame, text='Количество билетов')
             self.label_total_num.grid(column=0, row=2, sticky=W, columnspan=2)
@@ -180,6 +226,10 @@ class Root(Tk):
             self.label_num_to_know = ttk.Label(self.label_frame, text='Сколько из них нужно знать')
             self.label_num_to_know.grid(column=0, row=8, sticky=W, columnspan=2)
             self.label_num_to_know.configure(background='#ffffff', font=("Arial", 20))
+
+            self.label_concrete = ttk.Label(self.label_frame, text='Вероятность для конкретного случая')
+            self.label_concrete.grid(column=0, row=11, sticky=W, columnspan=2)
+            self.label_concrete.configure(background='#ffffff', font=("Arial", 20))
 
             self.label_part_1_1 = ttk.Label(self.label_frame, text='Часть 1')
             self.label_part_1_1.grid(column=0, row=3, sticky=W)
@@ -205,13 +255,23 @@ class Root(Tk):
             self.label_part_2_3.grid(column=1, row=9, sticky=W)
             self.label_part_2_3.configure(background='#ffffff', font=("Arial", 12))
 
+            self.label_part_1_4 = ttk.Label(self.label_frame, text='Часть 1')
+            self.label_part_1_4.grid(column=0, row=12, sticky=W)
+            self.label_part_1_4.configure(background='#ffffff', font=("Arial", 12))
+
+            self.label_part_2_4 = ttk.Label(self.label_frame, text='Часть 2')
+            self.label_part_2_4.grid(column=1, row=12, sticky=W)
+            self.label_part_2_4.configure(background='#ffffff', font=("Arial", 12))
+
             self.total_num_p1 = StringVar()
             self.num_to_take_p1 = StringVar()
             self.num_to_know_p1 = StringVar()
+            self.concrete_p1 = StringVar()
 
             self.total_num_p2 = StringVar()
             self.num_to_take_p2 = StringVar()
             self.num_to_know_p2 = StringVar()
+            self.concrete_p2 = StringVar()
 
             self.textbox_total_num_p1 = ttk.Entry(self.label_frame, width=10, textvariable=self.total_num_p1)
             self.textbox_total_num_p1.grid(column=0, row=4, sticky=W, pady=5)
@@ -225,6 +285,10 @@ class Root(Tk):
             self.textbox_num_to_know_p1.grid(column=0, row=10, sticky=W, pady=5)
             self.textbox_num_to_know_p1.configure(font=("Arial", 16))
 
+            self.textbox_concrete_p1 = ttk.Entry(self.label_frame, width=10, textvariable=self.concrete_p1)
+            self.textbox_concrete_p1.grid(column=0, row=12, sticky=W, pady=5)
+            self.textbox_concrete_p1.configure(font=("Arial", 16))
+
             self.textbox_total_num_p2 = ttk.Entry(self.label_frame, width=10, textvariable=self.total_num_p2)
             self.textbox_total_num_p2.grid(column=1, row=4, sticky=W, pady=5)
             self.textbox_total_num_p2.configure(font=("Arial", 16))
@@ -237,11 +301,17 @@ class Root(Tk):
             self.textbox_num_to_know_p2.grid(column=1, row=10, sticky=W, pady=5)
             self.textbox_num_to_know_p2.configure(font=("Arial", 16))
 
+            self.textbox_concrete_p2 = ttk.Entry(self.label_frame, width=10, textvariable=self.concrete_p2)
+            self.textbox_concrete_p2.grid(column=1, row=12, sticky=W, pady=5)
+            self.textbox_concrete_p2.configure(font=("Arial", 16))
+
     def draw_plot(self):
         f = Figure(figsize=(7,5), dpi=100)
         a = f.add_subplot(111)
         a.plot(self.x_axis, self.y_axis)
         a.grid(color='#dddddd', linestyle='--', linewidth=1)
+        a.set_xlabel('Число выученных билетов')
+        a.set_ylabel('Вероятность сдать экзамен')
 
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
