@@ -39,6 +39,7 @@ class Root(Tk):
         self.init_ui()
         self.draw_plot()
 
+
     def pick_rb(self):
         self.init_ui()
 
@@ -136,7 +137,7 @@ class Root(Tk):
             success = 0
             self.concrete_answer = ttk.Label(self.label_frame, text='Вероятность сдать  {}%'.format(
                 int(answer_concrete_1 * answer_concrete_2*100)))
-            self.concrete_answer.grid(column=0, row=14, sticky=W, columnspan=3)
+            self.concrete_answer.grid(column=0, row=15, sticky=W, columnspan=3)
             self.concrete_answer.configure(background='#ffffff', font=("Arial", 20))
 
 
@@ -209,7 +210,7 @@ class Root(Tk):
             self.textbox_total_num.destroy()
             self.textbox_num_to_take.destroy()
             self.textbox_num_to_know.destroy()
-            self.button.grid(row=13)
+            self.button.grid(row=14)
             try:
                 self.concrete_answer.destroy()
             except:
@@ -286,7 +287,7 @@ class Root(Tk):
             self.textbox_num_to_know_p1.configure(font=("Arial", 16))
 
             self.textbox_concrete_p1 = ttk.Entry(self.label_frame, width=10, textvariable=self.concrete_p1)
-            self.textbox_concrete_p1.grid(column=0, row=12, sticky=W, pady=5)
+            self.textbox_concrete_p1.grid(column=0, row=13, sticky=W, pady=5)
             self.textbox_concrete_p1.configure(font=("Arial", 16))
 
             self.textbox_total_num_p2 = ttk.Entry(self.label_frame, width=10, textvariable=self.total_num_p2)
@@ -302,10 +303,15 @@ class Root(Tk):
             self.textbox_num_to_know_p2.configure(font=("Arial", 16))
 
             self.textbox_concrete_p2 = ttk.Entry(self.label_frame, width=10, textvariable=self.concrete_p2)
-            self.textbox_concrete_p2.grid(column=1, row=12, sticky=W, pady=5)
+            self.textbox_concrete_p2.grid(column=1, row=13, sticky=W, pady=5)
             self.textbox_concrete_p2.configure(font=("Arial", 16))
 
     def draw_plot(self):
+        try:
+            self.canvas.destroy()
+            self.toolbar_frame.destroy()
+        except:
+            pass
         f = Figure(figsize=(7,5), dpi=100)
         a = f.add_subplot(111)
         a.plot(self.x_axis, self.y_axis)
@@ -313,13 +319,14 @@ class Root(Tk):
         a.set_xlabel('Число выученных билетов')
         a.set_ylabel('Вероятность сдать экзамен')
 
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(column = 0, row =0)
+        self.canvas = FigureCanvasTkAgg(f, self)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().grid(column = 0, row =0)
 
-        toolbar_frame = Frame(self)
-        toolbar_frame.grid(column=0, row=1)
-        toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
+        self.toolbar_frame = Frame(self)
+        self.toolbar_frame.grid(column=0, row=1)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbar_frame)
+
 
 def compare_p2_lists(list1, list2):
     if len(list1) >= len(list2):
